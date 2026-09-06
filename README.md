@@ -1,21 +1,72 @@
 # CodexPet_Kurisu
 
-牧濑红莉栖风格的 Codex Desktop 自定义桌宠。
+一个受《STEINS;GATE》中牧濑红莉栖启发的原创像素风 Codex Desktop 桌面伙伴。角色采用棕红长发、沙色外套和克制的研究者神态，不使用原作立绘或提取素材。本项目为非官方二次创作。
 
 ## 一键安装
 
-从 Releases 下载最新的 `OneClick.zip`，解压后双击 `install.bat`。
+Windows 用户可直接从 Releases 下载最新的 `OneClick.zip`：
 
-安装器会自动复制 `pet.json` 与 `spritesheet.webp` 到：
+1. 下载最新 Release 中的 `Kurisu-CodexPet-*-OneClick.zip`。
+2. 解压 ZIP。
+3. 双击 `install.bat`。
+4. 安装器会自动将 `pet.json` 与 `spritesheet.webp` 复制到：
+
+   `%USERPROFILE%\.codex\pets\kurisu`
+
+5. 重启 Codex Desktop，或刷新设置页中的 Pets。
+6. 在 **Settings → Personalization → Pets** 中选择 **Kurisu / 牧濑红莉栖**。
+
+如需手动安装，只需将 `pet.json` 和 `spritesheet.webp` 放入：
 
 `%USERPROFILE%\.codex\pets\kurisu`
 
-然后重启 Codex Desktop 或刷新 Pets，并选择 **Kurisu / 牧濑红莉栖**。
+## 兼容性
+
+- 格式：Codex Pet sprite contract v2
+- 制作与验证环境：Codex Desktop 26.901.6511.0（Windows）
+- 图集：1536 × 2288 px，8 列 × 11 行，单格 192 × 208 px，RGBA WebP
+- 配置：`spriteVersionNumber: 2`
+
+## 状态映射
+
+| 行 | Codex 状态 | 帧数 | 红莉栖的演绎 | 表情 / 注意目标 |
+|---:|---|---:|---|---|
+| 0 | `idle` | 6 | 站立待机，轻微呼吸、眨眼、侧目与发梢微动 | 冷静，低强度环境注意 |
+| 1 | `running-right` | 8 | 被向右拖动时快步跟随，头发滞后 | 轻微惊讶后转为不耐烦，看向移动方向 |
+| 2 | `running-left` | 8 | 被向左拖动时快步跟随，与右向动作有独立惯性 | 克制的不满，看向移动方向 |
+| 3 | `waving` | 4 | 短促、克制的半挥手 | 礼貌但不过分热情，面向用户 |
+| 4 | `jumping` | 5 | 悬停或鼠标交互时的惊跳小跳 | 短暂错愕与微恼，注意指针 |
+| 5 | `failed` | 8 | 皱眉、闭眼、轻触额头，然后恢复镇定 | 理性的挫败反应，不夸张沮丧 |
+| 6 | `waiting` | 6 | 先观察，再抱臂，最后略显不耐 | 等待输入或权限，注意用户一侧 |
+| 7 | `running` | 6 | 短暂查看深色小平板、输入、停顿思考 | 集中的研究者状态，注意工作内容 |
+| 8 | `review` | 6 | 仔细审视，眯眼判断，最后稍显自信 | 检查结果 / 等待用户审阅 |
+| 9 | `lookFrame` 000–157.5° | 8 | 从上方经右侧到右下方的注视 | 眼睛先行，头颈轻微跟随，下半身固定 |
+| 10 | `lookFrame` 180–337.5° | 8 | 从下方经左侧到左上方的注视 | 眼睛先行，头发有轻微滞后，下半身固定 |
+
+`lookFrame` 共 16 个方向，每隔 22.5° 一帧；000° 为上方，090° 为右方，180° 为下方，270° 为左方。中性死区由应用回退到 `idle`。
+
+## 测试建议
+
+1. 空闲时观察呼吸、眨眼与循环接缝。
+2. 拖动角色向左、向右，检查两个方向动作。
+3. 让它进入执行、等待、审阅和失败状态，确认对应动画可见。
+4. 将指针绕角色一周，检查 16 方向注视是否按顺序连续。
+5. 在深色与浅色界面上检查角色边缘，不应出现品红底色残留。
+
+## 已知限制
+
+- Codex Pet v2 是固定行约定；`pet.json` 不提供自定义距离档位、独立对话气泡或“等待已过多久”的独立子状态。
+- 因此，长时等待的情绪递进被编入同一个 `waiting` 循环，而非按真实时间阈值切换。
+- 小像素尺寸下，对角方向主要依靠瞳孔、眼睑、眉形和很小的头部角度差异；这些差异在高 DPI 缩放下可能较细微。
 
 ## 仓库结构
 
-- `outputs/`：最终资源、预览与安装脚本
+- `outputs/kurisu_pet/`：最终 Pet 资源、预览文件与安装脚本
 - `work/`：开发过程文件与中间产物
-- `.github/workflows/release.yml`：发布流程
+- `.github/workflows/release.yml`：Release 发布流程
 
 开发过程文件保留在仓库中，但不会进入 Release 安装包。
+
+## 质量记录
+
+`outputs/kurisu_pet/preview/` 包含状态 GIF、完整接触表、16 方向图和自动验证报告。最终 WebP 已检查尺寸、行列、透明度、空白单元格、色键残留、方向语义与循环连续性。
