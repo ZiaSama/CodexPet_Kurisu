@@ -2,17 +2,15 @@ name: Publish Kurisu Codex Pet v1.0.0
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/release-v1.0.0.yml
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'Publish Kurisu v1.0.0'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,7 +20,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TAG="v1.0.0"
           ZIP="Kurisu-CodexPet-v1.0.0.zip"
 
           test -f outputs/kurisu_pet/pet.json
