@@ -1,0 +1,92 @@
+name: Publish Kurisu Codex Pet v1.0.0
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-v1.0.0.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build minimal install package
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v1.0.0"
+          ZIP="Kurisu-CodexPet-v1.0.0.zip"
+
+          test -f outputs/kurisu_pet/pet.json
+          test -f outputs/kurisu_pet/spritesheet.webp
+
+          rm -rf release-package
+          mkdir -p release-package/kurisu
+          cp outputs/kurisu_pet/pet.json release-package/kurisu/pet.json
+          cp outputs/kurisu_pet/spritesheet.webp release-package/kurisu/spritesheet.webp
+
+          cd release-package
+          zip -9 -r "../${ZIP}" kurisu >/dev/null
+          cd ..
+
+          echo "Release package contents:"
+          unzip -l "${ZIP}"
+
+          FILES=$(unzip -Z1 "${ZIP}" | grep -v '/$' | sort)
+          EXPECTED=$(printf '%s\n' 'kurisu/pet.json' 'kurisu/spritesheet.webp' | sort)
+          if [ "${FILES}" != "${EXPECTED}" ]; then
+            echo "Unexpected files found in release package."
+            exit 1
+          fi
+
+      - name: Write release notes
+        shell: bash
+        run: |
+          cat > RELEASE_NOTES.md <<'EOF'
+          ## Kurisu Codex Pet v1.0.0
+
+          牧濑红莉栖风格的 Codex Desktop 自定义桌宠资源包。
+
+          ### Windows 安装
+
+          1. 下载 `Kurisu-CodexPet-v1.0.0.zip` 并解压。
+          2. 将解压得到的 `kurisu` 文件夹复制到：
+
+             `%USERPROFILE%\.codex\pets\kurisu`
+
+          3. 确认目录中包含：
+             - `pet.json`
+             - `spritesheet.webp`
+          4. 重启 Codex Desktop，或在设置页刷新 Pets。
+          5. 打开 **Settings → Personalization → Pets**，选择 **Kurisu / 牧濑红莉栖**。
+
+          ### 最小安装包
+
+          此 Release 的自定义 ZIP 仅包含 Codex Desktop 运行该 Pet 所需的两个文件，不包含 `work/`、`preview/`、`qa/`、`prompts/`、`frames/`、`decoded/` 等开发过程文件。
+          EOF
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v1.0.0"
+          ZIP="Kurisu-CodexPet-v1.0.0.zip"
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${ZIP}" --clobber
+          else
+            gh release create "${TAG}" "${ZIP}" \
+              --title "Kurisu Codex Pet v1.0.0" \
+              --notes-file RELEASE_NOTES.md \
+              --target "${GITHUB_SHA}"
+          fi
