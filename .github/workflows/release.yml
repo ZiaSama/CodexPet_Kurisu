@@ -2,17 +2,15 @@ name: Publish Kurisu Codex Pet
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/release.yml
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'Publish Kurisu v1.0.2 flat'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
