@@ -1,0 +1,10 @@
+{
+  "decision": "accepted_with_documented_minor_limits",
+  "blocking_gates": {
+    "horizontal_090_270": "pass",
+    "vertical_000_180": "pass"
+  },
+  "blind_validation_ok": true,
+  "labeled_semantic_review": "PASS",
+  "rationale": "Blind consensus passed both hard cardinal gates. Review-level warnings concern subtle diagonal cues at native pixel scale; an independent labeled visual review confirmed the intended principal quadrant for all 16 directions. These limitations are disclosed in README.md."
+}

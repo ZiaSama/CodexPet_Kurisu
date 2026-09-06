@@ -1,0 +1,35 @@
+{
+  "pet_id": "kurisu",
+  "display_name": "Kurisu / 牧濑红莉栖",
+  "status": "PASS",
+  "contract": {
+    "sprite_version_number": 2,
+    "atlas_size": [1536, 2288],
+    "grid": [8, 11],
+    "cell_size": [192, 208],
+    "format": "RGBA WebP"
+  },
+  "qa": {
+    "standard_rows": "PASS",
+    "atlas_validation": "PASS",
+    "chroma_despill": "PASS",
+    "cardinal_direction_gates": "PASS",
+    "blind_direction_validation": "PASS_WITH_REVIEW_WARNINGS",
+    "labeled_direction_semantics": "PASS",
+    "continuity": "PASS_WITH_REVIEW_WARNINGS",
+    "final_visual_qa": "PASS"
+  },
+  "documented_minor_limits": [
+    "Upper-left diagonal cues at 292.5, 315, and 337.5 degrees are subtle at native pixel scale.",
+    "Several adjacent gaze transitions are statistical outliers but preserve character, crop, and principal direction quadrant."
+  ],
+  "installation": {
+    "path": "C:\\Users\\FZY\\.codex\\pets\\kurisu",
+    "installed": true,
+    "installed_hash_matches_package": true
+  },
+  "sha256": {
+    "spritesheet.webp": "4fe00fca75b1f76e8b27304be8d6f653d7d34e6f537e6a4fd2f90d26dacbf936",
+    "pet.json": "755ac72c9a8d033f3dc59444782b0549dcec2a08b84ee5e368a390d29c805030"
+  }
+}
