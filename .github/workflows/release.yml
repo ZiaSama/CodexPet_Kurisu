@@ -1,0 +1,92 @@
+name: Publish Kurisu Codex Pet
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build flat one-click package
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP="Kurisu-CodexPet-v1.0.2-OneClick.zip"
+          SRC="outputs/kurisu_pet"
+
+          test -f "$SRC/install.bat"
+          test -f "$SRC/pet.json"
+          test -f "$SRC/spritesheet.webp"
+
+          rm -rf release-package
+          mkdir -p release-package
+          cp "$SRC/install.bat" release-package/install.bat
+          cp "$SRC/pet.json" release-package/pet.json
+          cp "$SRC/spritesheet.webp" release-package/spritesheet.webp
+
+          cd release-package
+          zip -9 -r "../$ZIP" install.bat pet.json spritesheet.webp >/dev/null
+          cd ..
+
+          FILES=$(unzip -Z1 "$ZIP" | sort)
+          EXPECTED=$(printf '%s\n' 'install.bat' 'pet.json' 'spritesheet.webp' | sort)
+          if [ "$FILES" != "$EXPECTED" ]; then
+            echo "Unexpected files found in release package."
+            unzip -l "$ZIP"
+            exit 1
+          fi
+
+      - name: Write release notes
+        shell: bash
+        run: |
+          cat > RELEASE_NOTES.md <<'EOF'
+          ## Kurisu Codex Pet v1.0.2 — One-click installer
+
+          目录结构已精简。下载并解压后，无需进入额外子文件夹。
+
+          ### 一键安装
+
+          1. 下载 `Kurisu-CodexPet-v1.0.2-OneClick.zip`。
+          2. 解压。
+          3. 双击 `install.bat`。
+          4. 脚本自动安装到 `%USERPROFILE%\.codex\pets\kurisu`。
+          5. 重启 Codex Desktop 或刷新 Pets，然后选择 **Kurisu / 牧濑红莉栖**。
+
+          ### ZIP 内容
+
+          解压后直接是：
+          - `install.bat`
+          - `pet.json`
+          - `spritesheet.webp`
+
+          不包含任何额外目录，也不包含开发文件。
+          EOF
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v1.0.2"
+          ZIP="Kurisu-CodexPet-v1.0.2-OneClick.zip"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ZIP" --clobber
+          else
+            gh release create "$TAG" "$ZIP" \
+              --title "Kurisu Codex Pet v1.0.2 - One-click installer" \
+              --notes-file RELEASE_NOTES.md \
+              --target "$GITHUB_SHA"
+          fi
